@@ -65,4 +65,4 @@ Updates Trpfd so you don't need to rely on TrinityModLoader for everything.
 ## Credits
 - Trinity Mod Loader / GFTool — research inspiration on TR archives.
 https://github.com/pkZukan/gftool
-- Vibe Coding Assistance from ChatGPT
+- Vibe Coding Assistance from ChatGPT.
