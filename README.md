@@ -1,8 +1,10 @@
 # TrpfdUpdater
-Updates Trpfd so you dont need to rely on TrinityModLoader for everything.
+Updates Trpfd so you don't need to rely on TrinityModLoader for everything.
 
 
 # UpdateTrpfd – Quick Start
+
+<img width="926" height="600" alt="image" src="https://github.com/user-attachments/assets/9787f770-006c-4948-966a-b64d51d307f0" />
 
 ## TL;DR
 1) Make a **mod pack** folder.
@@ -14,13 +16,8 @@ Updates Trpfd so you dont need to rely on TrinityModLoader for everything.
 ---
 
 ## Folder layout
-ModPackRoot/
-├─ arc/
-│ └─ data.trpfd # the descriptor this tool edits (copy from the game)
-└─ romfs/
-└─ ik_chara/model/... # your loose files, real in-game relative paths
-
-> If your loader expects `romfs/arc/data.trpfd`, that also works: set **Game Root** to `ModPackRoot` and the app will auto-detect `romfs/arc/data.trpfd`.
+- ModPackRoot/romfs/arc/data.trpfd **the descriptor this tool edits (copy from the game)**
+- ModPackRoot/romfs/ik_chara/model/... **your loose files, real in-game relative paths**
 
 ---
 
@@ -28,7 +25,7 @@ ModPackRoot/
 - Download the release ZIP and extract it anywhere.
 - Run `UpdateTrpfd.exe`.
 - Set:
-  - **Game Root** → `ModPackRoot` (folder containing `arc/data.trpfd` **or** `romfs/arc/data.trpfd`)
+  - **Game Root** → `ModPackRoot` (folder containing `romfs/arc/data.trpfd`)
   - **Romfs Root** → `ModPackRoot/romfs`
 - Click **Update TRPFD**.
 - Optional:
@@ -59,15 +56,11 @@ ModPackRoot/
 ## Tips
 - Paths must match game internals **exactly** (slashes and case matter per game rules).
 - Keep **Game Root** and **Romfs Root** different: `Game Root = ModPackRoot`, `Romfs Root = ModPackRoot/romfs`.
-- Do **not** ship base game files. Only ship your modified `data.trpfd` and your loose assets.
-- If you use a loader that requires `romfs/arc/data.trpfd`, put the file there—app auto-detects both layouts.
 
 ---
 
 ## Troubleshooting
 - **“value cannot be an empty string (path)”** – one of the roots is blank/invalid; set both roots, or run **Export TRPFD to CSV** after pressing **Test configuration** (if present) to verify detection.
-- **UI freeze when listing** – use **Export TRPFD to CSV** instead of logging tens of thousands of rows.
-- **Single-file EXE** – not supported with FlatSharp runtime codegen; ship non-single-file or use precompiled serializers.
 
 ## Credits
 - Trinity Mod Loader / GFTool — research inspiration on TR archives.
