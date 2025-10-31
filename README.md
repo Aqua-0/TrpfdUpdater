@@ -20,8 +20,6 @@ ModPackRoot/
 └─ romfs/
 └─ ik_chara/model/... # your loose files, real in-game relative paths
 
-markdown
-Copy code
 > If your loader expects `romfs/arc/data.trpfd`, that also works: set **Game Root** to `ModPackRoot` and the app will auto-detect `romfs/arc/data.trpfd`.
 
 ---
