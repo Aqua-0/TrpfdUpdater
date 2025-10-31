@@ -1,0 +1,71 @@
+﻿<Window x:Class="TrpfdManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="TRPFD Manager" Height="600" Width="940" MinWidth="760" MinHeight="500">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="Game Root (contains arc\data.trpfd or romfs\arc\data.trpfd)" VerticalAlignment="Center"/>
+        <TextBox Grid.Column="1" Margin="8,0" Text="{Binding GameRoot, UpdateSourceTrigger=PropertyChanged}"/>
+        <Button Grid.Column="2" Content="Browse…" Padding="12,4" Click="BrowseGameRoot_Click"/>
+
+        <TextBlock Grid.Row="1" Text="Romfs Root" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="1" Grid.Column="1" Margin="8,0" Text="{Binding RomfsRoot, UpdateSourceTrigger=PropertyChanged}"/>
+        <Button Grid.Row="1" Grid.Column="2" Content="Browse…" Padding="12,4" Click="BrowseRomfsRoot_Click"/>
+
+        <TextBlock Grid.Row="2" Text="Strip Prefix (optional)" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="2" Grid.Column="1" Margin="8,0" Text="{Binding StripPrefix, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0,12,0,8" VerticalAlignment="Center">
+            <CheckBox Content="Watch" IsChecked="{Binding Watch}" Margin="0,0,16,0"/>
+            <CheckBox Content="Dry-run" IsChecked="{Binding DryRun}" Margin="0,0,16,0"/>
+            <CheckBox Content="Auto-backup before save" IsChecked="{Binding AutoBackup}" Margin="0,0,16,0"/>
+            <Button Content="Update TRPFD" Padding="14,8" Click="UpdateButton_Click" Margin="0,0,8,0"/>
+            <Button Content="Export TRPFD to CSV" Padding="14,8" Click="ExportCsvButton_Click" Margin="0,0,8,0"/>
+            <Button Content="List recognized loose files" Padding="14,8" Click="ListLooseButton_Click" Margin="0,0,8,0"/>
+            <Button Content="Test configuration" Padding="14,8" Click="TestConfigButton_Click"/>
+            <TextBlock Text="{Binding Status}" Margin="16,0,0,0" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="4" Grid.ColumnSpan="3" Orientation="Vertical" Margin="0,0,0,8">
+            <TextBlock Text="{Binding ResolvedTrpfdPath, StringFormat=TRPFD: {0}}" ToolTip="{Binding ResolvedTrpfdPath}" />
+            <TextBlock Text="{Binding RomfsRoot, StringFormat=ROMFS: {0}}" ToolTip="{Binding RomfsRoot}" />
+            <TextBlock Text="{Binding LastBackupPath, StringFormat=Last backup: {0}}" ToolTip="{Binding LastBackupPath}" />
+        </StackPanel>
+
+        <Border Grid.Row="5" Grid.ColumnSpan="3" BorderBrush="#DDD" BorderThickness="1" CornerRadius="4">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Log" FontWeight="Bold" Margin="8"/>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Log}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" FontFamily="Consolas" FontSize="12"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <TextBlock Grid.Row="6" Grid.ColumnSpan="3" Foreground="#666" FontSize="12"
+               Text="Loose files must match in-game relative paths under romfs. Mappings are removed when present and restored when removed."/>
+    </Grid>
+</Window>
