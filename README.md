@@ -1,6 +1,6 @@
 # TRPFD Manager
 
-Build a single `romfs/arc/data.trpfd` that points to loose files from one or many mods. No manual merging. Ordered packs decide winners on conflicts.
+Build a single `romfs/arc/data.trpfd` that points to loose files from one or many mods. No manual merging. Ordered packs decide winners on conflicts. **This is meant as an alternative to TrinityModLoader, if you prefer that, then please use that.**
 
 ---
 
