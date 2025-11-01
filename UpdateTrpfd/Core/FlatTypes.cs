@@ -3,7 +3,6 @@ using FlatSharp.Attributes;
 
 namespace TrpfdManager.Core;
 
-// FlatSharp 7.x: properties virtual, vectors IList<T>.
 [FlatBufferTable]
 public class FileInfo
 {
@@ -18,7 +17,6 @@ public class PackInfo
     [FlatBufferItem(1)] public virtual ulong FileCount { get; set; } = 0;
 }
 
-// Single table. 0..3 base schema. 4..5 extra stash; ignored by the game.
 [FlatBufferTable]
 public class FileDescriptor
 {
@@ -26,7 +24,25 @@ public class FileDescriptor
     [FlatBufferItem(1)] public virtual IList<string> PackNames { get; set; } = new List<string>();
     [FlatBufferItem(2)] public virtual IList<FileInfo> FileInfo { get; set; } = new List<FileInfo>();
     [FlatBufferItem(3)] public virtual IList<PackInfo> PackInfo { get; set; } = new List<PackInfo>();
-
     [FlatBufferItem(4)] public virtual IList<ulong> UnusedHashes { get; set; } = new List<ulong>();
     [FlatBufferItem(5)] public virtual IList<FileInfo> UnusedFileInfo { get; set; } = new List<FileInfo>();
+}
+
+internal static class FdFixer
+{
+    public static void Fix(FileDescriptor fd)
+    {
+        fd.FileHashes ??= new List<ulong>();
+        fd.FileInfo ??= new List<FileInfo>();
+        fd.PackNames ??= new List<string>();
+        fd.PackInfo ??= new List<PackInfo>();
+        fd.UnusedHashes ??= new List<ulong>();
+        fd.UnusedFileInfo ??= new List<FileInfo>();
+
+        while (fd.FileInfo.Count < fd.FileHashes.Count) fd.FileInfo.Add(new FileInfo());
+        while (fd.FileInfo.Count > fd.FileHashes.Count) fd.FileInfo.RemoveAt(fd.FileInfo.Count - 1);
+
+        while (fd.UnusedFileInfo.Count < fd.UnusedHashes.Count) fd.UnusedFileInfo.Add(new FileInfo());
+        while (fd.UnusedFileInfo.Count > fd.UnusedHashes.Count) fd.UnusedFileInfo.RemoveAt(fd.UnusedFileInfo.Count - 1);
+    }
 }

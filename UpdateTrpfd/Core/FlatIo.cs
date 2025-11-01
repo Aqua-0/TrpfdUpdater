@@ -1,9 +1,9 @@
-﻿using System;
-using System.Buffers;
+﻿using System.Buffers;
 using System.IO;
 using FlatSharp;
 
 namespace TrpfdManager.Core;
+
 internal static class FlatIo
 {
     public static T Load<T>(string path) where T : class

@@ -1,60 +1,213 @@
 ﻿<Window x:Class="TrpfdManager.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="TRPFD Manager" Height="600" Width="940" MinWidth="760" MinHeight="500">
+        Title="TRPFD Manager" Height="700" Width="1104"
+        Background="{DynamicResource WindowBg}" Foreground="{DynamicResource TextFg}"
+        Icon="pack://application:,,,/Assets/trpfd_manager_icon.ico">
     <Grid Margin="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition x:Name="LogRow" Height="220"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
 
-        <TextBlock Text="Game Root (contains arc\data.trpfd or romfs\arc\data.trpfd)" VerticalAlignment="Center"/>
-        <TextBox Grid.Column="1" Margin="8,0" Text="{Binding GameRoot, UpdateSourceTrigger=PropertyChanged}"/>
-        <Button Grid.Column="2" Content="Browse…" Padding="12,4" Click="BrowseGameRoot_Click"/>
+        <DockPanel Grid.Row="0" Margin="0,0,0,10">
+            <TextBlock Text="TRPFD Manager" FontSize="18" FontWeight="Bold" Margin="0,0,16,0"/>
+            <StackPanel Orientation="Horizontal">
+                <CheckBox Content="Show Log" IsChecked="{Binding ShowLog}"/>
+                <CheckBox Content="Dark mode" IsChecked="{Binding IsDark}" Margin="12,0,0,0"
+                  Checked="DarkMode_Checked" Unchecked="DarkMode_Checked"/>
+            </StackPanel>
+        </DockPanel>
 
-        <TextBlock Grid.Row="1" Text="Romfs Root" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="1" Grid.Column="1" Margin="8,0" Text="{Binding RomfsRoot, UpdateSourceTrigger=PropertyChanged}"/>
-        <Button Grid.Row="1" Grid.Column="2" Content="Browse…" Padding="12,4" Click="BrowseRomfsRoot_Click"/>
+        <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex}">
+            <TabControl.Resources>
+                <SolidColorBrush x:Key="TabHeaderBg"         Color="#2E3240"/>
+                <SolidColorBrush x:Key="TabHeaderBgSelected" Color="#3A3F50"/>
+                <SolidColorBrush x:Key="TabHeaderBorder"     Color="#444A5A"/>
 
-        <TextBlock Grid.Row="2" Text="Strip Prefix (optional)" VerticalAlignment="Center"/>
-        <TextBox Grid.Row="2" Grid.Column="1" Margin="8,0" Text="{Binding StripPrefix, UpdateSourceTrigger=PropertyChanged}"/>
+                <Style TargetType="TabItem">
+                    <Setter Property="Padding" Value="10,4"/>
+                    <Setter Property="Margin" Value="0,0,4,0"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Border x:Name="Bd"
+                        Background="{DynamicResource TabHeaderBg}"
+                        BorderBrush="{DynamicResource TabHeaderBorder}"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Bd" Property="Background"  Value="{DynamicResource TabHeaderBgSelected}"/>
+                                        <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource AccentBr}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter TargetName="Bd" Property="Opacity" Value="0.6"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
 
-        <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0,12,0,8" VerticalAlignment="Center">
-            <CheckBox Content="Watch" IsChecked="{Binding Watch}" Margin="0,0,16,0"/>
-            <CheckBox Content="Dry-run" IsChecked="{Binding DryRun}" Margin="0,0,16,0"/>
-            <CheckBox Content="Auto-backup before save" IsChecked="{Binding AutoBackup}" Margin="0,0,16,0"/>
-            <Button Content="Update TRPFD" Padding="14,8" Click="UpdateButton_Click" Margin="0,0,8,0"/>
-            <Button Content="Export TRPFD to CSV" Padding="14,8" Click="ExportCsvButton_Click" Margin="0,0,8,0"/>
-            <Button Content="List recognized loose files" Padding="14,8" Click="ListLooseButton_Click" Margin="0,0,8,0"/>
-            <Button Content="Test configuration" Padding="14,8" Click="TestConfigButton_Click"/>
-            <TextBlock Text="{Binding Status}" Margin="16,0,0,0" VerticalAlignment="Center"/>
-        </StackPanel>
+            <!-- Overlay -->
+            <TabItem Header="Overlay" Margin="101,-1,-117,1">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Row="4" Grid.ColumnSpan="3" Orientation="Vertical" Margin="0,0,0,8">
-            <TextBlock Text="{Binding ResolvedTrpfdPath, StringFormat=TRPFD: {0}}" ToolTip="{Binding ResolvedTrpfdPath}" />
-            <TextBlock Text="{Binding RomfsRoot, StringFormat=ROMFS: {0}}" ToolTip="{Binding RomfsRoot}" />
-            <TextBlock Text="{Binding LastBackupPath, StringFormat=Last backup: {0}}" ToolTip="{Binding LastBackupPath}" />
-        </StackPanel>
+                    <TextBlock Text="Packs Root (…/user/load/&lt;gameid&gt;)" VerticalAlignment="Center" Foreground="{DynamicResource MutedFg}"/>
+                    <TextBox Grid.Column="1" Margin="8,0" Text="{Binding Overlay.PacksRoot, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="2" Content="Browse…" Click="BrowsePacksRoot_Click"/>
 
-        <Border Grid.Row="5" Grid.ColumnSpan="3" BorderBrush="#DDD" BorderThickness="1" CornerRadius="4">
-            <Grid>
+                    <TextBlock Grid.Row="1" Text="Base TRPFD" VerticalAlignment="Center" Foreground="{DynamicResource MutedFg}"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="8,0" Text="{Binding Overlay.BaseTrpfd, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Row="1" Grid.Column="2" Content="Browse…" Click="BrowseBaseTrpfd_Click"/>
+
+                    <TextBlock Grid.Row="2" Text="Output Root (currenttrpfd)" VerticalAlignment="Center" Foreground="{DynamicResource MutedFg}"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" Margin="8,0" Text="{Binding Overlay.OutputRoot, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Row="2" Grid.Column="2" Content="Browse…" Click="BrowseOutputRoot_Click"/>
+
+                    <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0,12,0,0">
+                        <Button Content="Scan" Click="ScanPacks_Click"/>
+                        <Button Content="Fix Layout (create romfs)" Click="FixLayout_Click"/>
+                        <Button Content="Enable All" Click="EnableAll_Click"/>
+                        <Button Content="Disable All" Click="DisableAll_Click"/>
+                        <CheckBox Content="Neutralize pack TRPFDs" IsChecked="{Binding Overlay.Neutralize}"/>
+                        <Button Content="Restore TRPFDs" Click="RestoreNeutralized_Click"/>
+                        <CheckBox Content="Auto-apply" IsChecked="{Binding Overlay.AutoApply}"/>
+                        <Button Content="Apply Overlay" Click="ApplyOverlay_Click"/>
+                        <Button Content="List loose (selected)" Click="ListOverlayLoose_Click" Margin="8,0,0,0"/>
+                        <Button Content="Conflicts" Click="OverlayConflicts_Click" Margin="8,0,0,0"/>
+                        <CheckBox Content="Show Log" IsChecked="{Binding ShowLog}" Margin="16,0,0,0"/>
+                    </StackPanel>
+
+                    <Grid Grid.Row="4" Grid.ColumnSpan="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <ListBox ItemsSource="{Binding Overlay.Packs}" SelectedItem="{Binding Overlay.SelectedPack}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel>
+                                        <CheckBox IsChecked="{Binding IsEnabled}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" />
+                                            <TextBlock Text="  (no romfs)" Foreground="OrangeRed" FontStyle="Italic" Margin="4,0,0,0"
+                                 Visibility="{Binding NeedsLayoutFix, Converter={StaticResource BoolToVis}}"/>
+                                        </StackPanel>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <StackPanel Grid.Column="1" Orientation="Vertical" Margin="8,0,0,0" VerticalAlignment="Top">
+                            <Button Content="▲ Up" Click="MoveUp_Click" Margin="0,0,0,8"/>
+                            <Button Content="▼ Down" Click="MoveDown_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <!-- Mods Merger -->
+            <TabItem Header="Mods Merger" Margin="-64,0,56,0">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Mods Root:" VerticalAlignment="Center" Foreground="{DynamicResource MutedFg}"/>
+                        <TextBox Text="{Binding Mods.ModsRoot, UpdateSourceTrigger=PropertyChanged}" Margin="8,0" MinWidth="420"/>
+                        <Button Content="Summary" Click="ModsSummary_Click" Margin="6,0,0,0"/>
+                        <Button Content="Choose…" Click="ModsChooseRoot_Click" Margin="6,0,0,0"/>
+                        <Button Content="Open Mods Folder" Click="ModsOpenFolder_Click" Margin="6,0,0,0"/>
+                        <Button Content="Scan Mods" Click="ModsScan_Click" Margin="6,0,0,0"/>
+                        <Button Content="List loose (selected)" Click="ModsListLoose_Click" Margin="6,0,0,0"/>
+                        <Button Content="Conflicts" Click="ModsConflicts_Click" Margin="6,0,0,0"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,8,0,8">
+                        <TextBlock Text="Target Romfs:" VerticalAlignment="Center" Foreground="{DynamicResource MutedFg}"/>
+                        <TextBox Text="{Binding Mods.TargetRomfs, UpdateSourceTrigger=PropertyChanged}" Margin="8,0" MinWidth="420"/>
+                        <Button Content="Choose…" Click="ModsChooseTarget_Click" Margin="6,0,0,0"/>
+                        <Button Content="Copy Selected → Target" Click="ModsCopyToRomfs_Click" Margin="6,0,0,0"/>
+                        <Button Content="Copy + Build TRPFD" Click="ModsCopyAndBuild_Click" Margin="6,0,0,0"/>
+                        <Button Content="Enable All" Click="ModsEnableAll_Click" Margin="16,0,0,0"/>
+                        <Button Content="Disable All" Click="ModsDisableAll_Click" Margin="6,0,0,0"/>
+                    </StackPanel>
+
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <ListBox ItemsSource="{Binding Mods.Packs}" SelectedItem="{Binding Mods.Selected}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel>
+                                        <CheckBox IsChecked="{Binding IsEnabled}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" />
+                                            <TextBlock Text="{Binding RecognizedCount, StringFormat=  ({0} files)}" Foreground="{DynamicResource MutedFg}"/>
+                                        </StackPanel>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <StackPanel Grid.Column="1" Orientation="Vertical" Margin="8,0,0,0" VerticalAlignment="Top">
+                            <Button Content="▲ Up" Click="ModsMoveUp_Click" Margin="0,0,0,8"/>
+                            <Button Content="▼ Down" Click="ModsMoveDown_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <GridSplitter Grid.Row="2" Height="6" HorizontalAlignment="Stretch"
+                  Background="{DynamicResource BorderBr}"
+                  ShowsPreview="True" ResizeDirection="Rows"
+                  Visibility="{Binding ShowLog, Converter={StaticResource BoolToVis}}"/>
+
+        <Border Grid.Row="3" Margin="0,10,0,8" CornerRadius="8"
+            Background="{DynamicResource LogBg}"
+            BorderBrush="{DynamicResource BorderBr}" BorderThickness="1"
+            Visibility="{Binding ShowLog, Converter={StaticResource BoolToVis}}">
+            <Grid x:Name="LogContainer">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="Log" FontWeight="Bold" Margin="8"/>
+                <TextBlock Text="Log" FontWeight="Bold" Margin="8,6,8,4"/>
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding Log}">
+                    <ItemsControl ItemsSource="{Binding Log}" Foreground="{DynamicResource LogFg}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding}" FontFamily="Consolas" FontSize="12"/>
@@ -65,7 +218,7 @@
             </Grid>
         </Border>
 
-        <TextBlock Grid.Row="6" Grid.ColumnSpan="3" Foreground="#666" FontSize="12"
-               Text="Loose files must match in-game relative paths under romfs. Mappings are removed when present and restored when removed."/>
+        <TextBlock Grid.Row="4" Foreground="{DynamicResource MutedFg}" FontSize="12" Margin="0,4,0,0"
+               Text="Overlay: later packs win for the same path. Tool writes only currenttrpfd/romfs/arc/data.trpfd. Pack-bundled TRPFDs can be neutralized."/>
     </Grid>
 </Window>

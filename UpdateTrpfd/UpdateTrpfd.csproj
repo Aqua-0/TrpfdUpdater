@@ -6,8 +6,10 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<ApplicationIcon>Assets\trpfd_manager_icon.ico</ApplicationIcon>
 	</PropertyGroup>
 	<ItemGroup>
-	  <PackageReference Include="FlatSharp" Version="6.3.5" />
+		<Resource Include="Assets\trpfd_manager_icon.ico" />
+		<PackageReference Include="FlatSharp" Version="7.4.0" />
 	</ItemGroup>
 </Project>
